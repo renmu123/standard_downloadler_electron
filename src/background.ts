@@ -5,6 +5,9 @@ import {
   createProtocol,
   /* installVueDevtools */
 } from 'vue-cli-plugin-electron-builder/lib'
+const exec = require('child_process').exec;
+const path = require('path');
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -12,13 +15,15 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 let win: BrowserWindow | null
 
 // Scheme must be registered before the app is ready
-protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
+protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
 
-function createWindow () {
+function createWindow() {
   // Create the browser window.
-  win = new BrowserWindow({ width: 800, height: 600, webPreferences: {
-    nodeIntegration: true
-  } })
+  win = new BrowserWindow({
+    width: 800, height: 600, webPreferences: {
+      nodeIntegration: true
+    }
+  })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -70,6 +75,9 @@ app.on('ready', async () => {
     // }
 
   }
+  runExec()
+  console.log("asdsad")
+
   createWindow()
 })
 
@@ -86,4 +94,25 @@ if (isDevelopment) {
       app.quit()
     })
   }
+}
+
+function runExec() {
+  // 执行命令行，如果命令不需要路径，或就是项目根目录，则不需要cwd参数：
+  let workerProcess = exec("E:\\Desktop\\fronted\\src\\api.exe")
+  // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
+
+  // 打印正常的后台可执行程序输出
+  workerProcess.stdout.on('data', function (data) {
+    console.log('stdout: ' + data)
+  })
+
+  // 打印错误的后台可执行程序输出
+  workerProcess.stderr.on('data', function (data) {
+    console.log('stderr: ' + data)
+  })
+
+  // 退出之后的输出
+  workerProcess.on('close', function (code) {
+    console.log('out code：' + code)
+  })
 }
